@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AETHER CALIBRE 01 — The Architecture of Time</title>
+    <meta name="description" content="Cinematic luxury Swiss watchmaking experience featuring scroll-driven 3D exploded engineering visualization.">
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="css/style.css">
+
+    <!-- Vendor Libraries -->
+    <script src="vendor/three.min.js"></script>
+    <script src="vendor/OrbitControls.js"></script>
+    <script src="vendor/gsap.min.js"></script>
+    <script src="vendor/ScrollTrigger.min.js"></script>
+    <script src="vendor/lenis.min.js"></script>
+</head>
+<body>
+
+    <!-- PRELOADER -->
+    <div id="preloader">
+        <h1 class="loader-brand">AETHER</h1>
+        <p class="loader-sub">GENÈVE • CALIBRE 01</p>
+        <div class="loader-bar-wrap">
+            <div class="loader-bar-fill"></div>
+        </div>
+    </div>
+
+    <!-- LUXURY NAVIGATION HEADER -->
+    <header class="luxury-header">
+        <a href="#" class="brand-monogram">
+            <svg class="brand-crest" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <circle cx="12" cy="12" r="9"/>
+                <polygon points="12 4 14.5 9.5 20 12 14.5 14.5 12 20 9.5 14.5 4 12 9.5 9.5 12 4"/>
+            </svg>
+            <span class="brand-name">AETHER</span>
+            <span class="brand-calibre">CALIBRE 01 // 31 JEWELS</span>
+        </a>
+
+        <nav class="header-center-nav">
+            <a href="#experience-container" class="nav-link">Architecture</a>
+            <a href="#" class="nav-link open-specs-btn">Specifications</a>
+            <a href="#manufacture" class="nav-link">Craftsmanship</a>
+            <a href="#" class="nav-link open-reserve-btn">Bespoke Allocation</a>
+        </nav>
+
+        <div class="header-actions">
+            <!-- Procedural Audio Toggle -->
+            <button id="toggle-sound-btn" class="btn-sound-toggle" title="Toggle 4Hz Escapement Sound (M)">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M11 5L6 9H2v6h4l5 4V5z"/>
+                    <line x1="23" y1="9" x2="17" y2="15"/>
+                    <line x1="17" y1="9" x2="23" y2="15"/>
+                </svg>
+                <span>SOUND: MUTED</span>
+            </button>
+
+            <!-- Reserve Button -->
+            <button class="btn-reserve open-reserve-btn">Reserve Piece</button>
+        </div>
+    </header>
+
+    <!-- TOP SCROLL PROGRESS BAR -->
+    <div id="scroll-progress-line">
+        <div id="scroll-progress-fill"></div>
+    </div>
+
+    <!-- FINISH / COLORWAY SWITCHER HUD -->
+    <aside class="finish-switcher-hud" aria-label="Calibre Finishes">
+        <button class="finish-option-btn active" data-finish="titanium" title="Titanium Chronos">
+            <span class="color-swatch swatch-titanium"></span>
+            <span>Titanium</span>
+        </button>
+        <button class="finish-option-btn" data-finish="rosegold" title="18k Rose Gold Nocturne">
+            <span class="color-swatch swatch-rosegold"></span>
+            <span>Rose Gold</span>
+        </button>
+        <button class="finish-option-btn" data-finish="obsidian" title="Obsidian DLC Stealth">
+            <span class="color-swatch swatch-obsidian"></span>
+            <span>Obsidian DLC</span>
+        </button>
+    </aside>
+
+    <!-- FLOATING SPECIFICATIONS HUD -->
+    <aside id="floating-specs-hud" aria-label="Mechanical Specifications">
+        <div class="spec-hud-pill">
+            <div class="spec-hud-val">31 JEWELS</div>
+            <div class="spec-hud-label">Synthetic Corundum Rubies</div>
+        </div>
+        <div class="spec-hud-pill">
+            <div class="spec-hud-val">72 HOURS</div>
+            <div class="spec-hud-label">Twin-Barrel Power Reserve</div>
+        </div>
+        <div class="spec-hud-pill">
+            <div class="spec-hud-val">28,800 VPH (4Hz)</div>
+            <div class="spec-hud-label">Variable Inertia Balance</div>
+        </div>
+        <div class="spec-hud-pill">
+            <div class="spec-hud-val">CHRONOMÈTRE</div>
+            <div class="spec-hud-label">COSC Certified ±2 sec/day</div>
+        </div>
+    </aside>
+
+    <!-- BOTTOM INSPECTION CONTROLS & EXPLODE SCRUBBER -->
+    <div id="inspection-hud-controls">
+        <span id="current-phase-label" class="phase-tag">PHASE 00 — ASSEMBLED CHRONOMÈTRE</span>
+
+        <div class="scrubber-wrap">
+            <input type="range" id="explode-scrubber" class="scrubber-slider" min="0" max="100" value="0" title="Exploded Scrubber">
+            <span id="scroll-progress-pct" class="phase-tag" style="min-width: 32px;">0%</span>
+        </div>
+
+        <button id="toggle-orbit-btn" class="btn-orbit-cam" title="Rotate freely around the watch in 3D (O)">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/>
+                <path d="M2 12h20"/>
+            </svg>
+            <span>INSPECT 3D (ORBIT)</span>
+        </button>
+
+        <button id="reset-cam-btn" class="btn-reset-cam" title="Reset camera to default view">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+                <path d="M3 3v5h5"/>
+            </svg>
+            <span>RESET</span>
+        </button>
+    </div>
+
+    <!-- DYNAMIC LEADER LINES OVERLAY (2D/3D Dynamic Projected SVG) -->
+    <div id="leader-lines-container">
+        <svg id="leader-lines-svg"></svg>
+        <div id="leader-labels-container"></div>
+    </div>
+
+    <!-- RAYCAST HOVER TOOLTIP -->
+    <div id="part-hover-tooltip">
+        <span class="tooltip-code">PART 01</span>
+        <div class="tooltip-name">SAPPHIRE CRYSTAL</div>
+        <div class="tooltip-spec">Synthetic Corundum (9 Mohs)</div>
+    </div>
+
+    <!-- MAIN SCROLL-DRIVEN 3D PINNED SECTION -->
+    <main id="experience-container">
+        <!-- Pinned Three.js WebGL Canvas Stage -->
+        <div id="canvas-stage"></div>
+
+        <!-- 600vh Scroll Height Track -->
+        <div id="scroll-track"></div>
+
+        <!-- HERO SECTION NARRATIVE (Phase 00) -->
+        <section id="hero-narrative">
+            <span class="hero-super">CALIBRE 01 MANUFACTURE</span>
+            <h1 class="hero-title">TIME,<br>ENGINEERED.</h1>
+            <p class="hero-sub">A mechanical masterpiece, revealed piece by piece. 23 hand-finished components suspended in micron-level symmetry.</p>
+            <div class="scroll-indicator">
+                <span>SCROLL TO DISASSEMBLE</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <line x1="12" y1="5" x2="12" y2="19"/>
+                    <polyline points="19 12 12 19 5 12"/>
+                </svg>
+            </div>
+        </section>
+
+        <!-- MECHANICAL REVEAL NARRATIVE (Phase 01) -->
+        <section id="reveal-narrative">
+            <h2 class="reveal-title">EVERY SECOND HAS A MECHANISM.</h2>
+            <p class="reveal-sub">Tolerances measured in microns. Energy regulated to within two parts in eighty-six thousand four hundred.</p>
+        </section>
+
+        <!-- EXPLODED ARCHITECTURE NARRATIVE (Phase 03) -->
+        <section id="exploded-narrative">
+            <h2 class="exploded-title">THE ARCHITECTURE OF TIME</h2>
+            <p class="exploded-sub">Suspended in space along its assembly axis. Hover over any component to inspect its micro-engineering dossier.</p>
+        </section>
+    </main>
+
+    <!-- TECHNICAL DOSSIER SIDE DRAWER -->
+    <aside id="dossier-drawer" aria-labelledby="dossier-part-title">
+        <div class="dossier-header">
+            <div class="dossier-meta">
+                <span id="dossier-part-code">PART 08 // CALIBRE 01</span>
+                <h3 id="dossier-part-title">BALANCE WHEEL</h3>
+                <span id="dossier-part-role">Harmonic Oscillator (28,800 VPH)</span>
+            </div>
+            <button id="close-dossier-btn" class="btn-close-drawer" title="Close Dossier (Esc)">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"/>
+                    <line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+            </button>
+        </div>
+
+        <div class="dossier-body">
+            <div class="dossier-spec-grid">
+                <div class="dossier-spec-card">
+                    <div class="dossier-spec-label">TOLERANCE</div>
+                    <div id="dossier-tolerance" class="dossier-spec-val">± 0.0005 mm</div>
+                </div>
+                <div class="dossier-spec-card">
+                    <div class="dossier-spec-label">MATERIAL</div>
+                    <div id="dossier-material" class="dossier-spec-val">Glucydur Bronze</div>
+                </div>
+            </div>
+
+            <div class="dossier-desc-label">ENGINEERING PROFILE</div>
+            <p id="dossier-desc">
+                The regulating organ oscillating at 4 Hz (28,800 vibrations/hour). The variable-inertia balance wheel is poise-adjusted with 8 blued gold masselottes, powered by a self-compensating anti-magnetic Archimedean hairspring.
+            </p>
+        </div>
+
+        <div class="dossier-footer">
+            <button id="focus-part-cam-btn" class="btn-focus-cam">Focus Macro Camera</button>
+        </div>
+    </aside>
+
+    <!-- MANUFACTURE & CRAFTSMANSHIP SECTION -->
+    <section id="manufacture" class="manufacture-section">
+        <div class="manufacture-header">
+            <span class="sec-tag">SWISS HAUTE HORLOGERIE</span>
+            <h2 class="sec-title">GENEVAN CRAFTSMANSHIP</h2>
+            <p class="sec-desc">Every edge, chamfer, and tooth on Calibre 01 is hand-decorated by master artisans in accordance with the exacting standards of the Geneva Seal.</p>
+        </div>
+
+        <div class="craft-grid">
+            <div class="craft-card">
+                <div class="craft-num">01</div>
+                <h3 class="craft-title">HAUTE ANGLAGE</h3>
+                <p class="craft-text">Internal angles and curved bridge perimeters are hand-beveled with diamond files and polished to a mirror glaze using dried gentian wood paste, creating dazzling light reflections across the movement.</p>
+            </div>
+            <div class="craft-card">
+                <div class="craft-num">02</div>
+                <h3 class="craft-title">CÔTES DE GENÈVE</h3>
+                <p class="craft-text">Parallel decorative wave striping micro-milled across bridges and oscillating weight. The subtle 45-degree grain catches dynamic light shifts as the wrist tilts.</p>
+            </div>
+            <div class="craft-card">
+                <div class="craft-num">03</div>
+                <h3 class="craft-title">THERMAL BLUEING</h3>
+                <p class="craft-text">Carbon steel screws heated individually over brass filings to exactly 290°C. The surface forms a protective royal cornflower blue magnetite oxide layer of absolute purity.</p>
+            </div>
+        </div>
+
+        <div class="reassembly-banner">
+            <div class="reassembly-scroll-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'});">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <line x1="12" y1="19" x2="12" y2="5"/>
+                    <polyline points="5 12 12 5 19 12"/>
+                </svg>
+                <span>SCROLL UP TO REASSEMBLE</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- SPECIFICATIONS MODAL -->
+    <div id="specs-modal" class="luxury-modal" aria-hidden="true">
+        <div class="modal-content-box">
+            <button id="close-specs-btn" class="modal-close-btn" title="Close (Esc)">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"/>
+                    <line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+            </button>
+            <h3 class="modal-title">CALIBRE 01 SPECIFICATIONS</h3>
+            <p class="modal-subtitle">Official Technical Registry • Manufactured in Le Locle, Switzerland</p>
+
+            <table class="specs-table">
+                <tbody>
+                    <tr>
+                        <td>Case Diameter</td>
+                        <td>41.5 mm • Thickness: 10.8 mm</td>
+                    </tr>
+                    <tr>
+                        <td>Case Material</td>
+                        <td>Grade 5 Titanium (Ti-6Al-4V) Satin Brushed & Polished</td>
+                    </tr>
+                    <tr>
+                        <td>Bezel</td>
+                        <td>Zirconium Dioxide Ceramic with Liquid Platinum Tachymeter</td>
+                    </tr>
+                    <tr>
+                        <td>Crystals</td>
+                        <td>Double-Domed Front Sapphire & Exhibition Sapphire Back</td>
+                    </tr>
+                    <tr>
+                        <td>Movement</td>
+                        <td>Aether Calibre 01 Automatic Chronomètre</td>
+                    </tr>
+                    <tr>
+                        <td>Total Components</td>
+                        <td>286 Individual Hand-Finished Parts</td>
+                    </tr>
+                    <tr>
+                        <td>Jewels</td>
+                        <td>31 Synthetic Ruby Bearings in Gold Chatons</td>
+                    </tr>
+                    <tr>
+                        <td>Frequency</td>
+                        <td>28,800 Vibrations Per Hour (4 Hz)</td>
+                    </tr>
+                    <tr>
+                        <td>Power Reserve</td>
+                        <td>72 Hours Autonomous Twin-Barrel</td>
+                    </tr>
+                    <tr>
+                        <td>Water Resistance</td>
+                        <td>30 Bar / 300 Meters / 1,000 Feet</td>
+                    </tr>
+                    <tr>
+                        <td>Finishing</td>
+                        <td>Hand Anglage, Côtes de Genève, Circular Perlage, Blued Screws</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- BESPOKE ALLOCATION RESERVATION MODAL -->
+    <div id="reservation-modal" class="luxury-modal" aria-hidden="true">
+        <div class="modal-content-box">
+            <button id="close-reserve-btn" class="modal-close-btn" title="Close (Esc)">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"/>
+                    <line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+            </button>
+            <h3 class="modal-title">BESPOKE ALLOCATION</h3>
+            <p class="modal-subtitle">Limited Manufacture Production: Piece #042 of 1,000</p>
+
+            <form id="reserve-form" class="reserve-form">
+                <div class="form-group">
+                    <label class="form-label" for="client-name">Full Name</label>
+                    <input type="text" id="client-name" class="form-input" placeholder="e.g. Lord Alexander Wright" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="client-email">Private Email</label>
+                    <input type="email" id="client-email" class="form-input" placeholder="client@domain.com" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="client-finish">Preferred Finish</label>
+                    <select id="client-finish" class="form-select">
+                        <option value="titanium">Grade 5 Titanium Chronos (Ref. 01.100)</option>
+                        <option value="rosegold">18K 5N Rose Gold Nocturne (Ref. 01.200)</option>
+                        <option value="obsidian">Diamond-Like Carbon Obsidian Stealth (Ref. 01.300)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="client-notes">Concierge Notes</label>
+                    <input type="text" id="client-notes" class="form-input" placeholder="Special engraving or strap sizing requests">
+                </div>
+                <button type="submit" class="btn-form-submit">Submit Concierge Allocation Request</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- LUXURY FOOTER -->
+    <footer class="luxury-footer">
+        <div>© 2026 AETHER MANUFACTURE HORLOGÈRE GENÈVE. ALL RIGHTS RESERVED.</div>
+        <div>SWISS CHRONOMETER OFFICIALLY CERTIFIED • POINÇON DE GENÈVE STANDARDS</div>
+    </footer>
+
+    <!-- Application Scripts -->
+    <script src="js/audio.js"></script>
+    <script src="js/materials.js"></script>
+    <script src="js/watch-geometry.js"></script>
+    <script src="js/scene.js"></script>
+    <script src="js/leader-lines.js"></script>
+    <script src="js/scroll-controller.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
